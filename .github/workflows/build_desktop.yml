@@ -128,6 +128,7 @@ jobs:
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           TAG="desktop-build-$(date -u +%Y%m%d-%H%M)-${GITHUB_SHA::7}"
           TITLE="Desktop Build ${TAG}"
@@ -135,5 +136,7 @@ jobs:
             release-assets/Exchange_Airdrop_Analyzer_macos_aarch64.zip \
             release-assets/Exchange_Airdrop_Analyzer_macos_x64.zip \
             release-assets/Exchange_Airdrop_Analyzer_windows_portable.zip \
+            --repo "$GH_REPO" \
+            --target "$GITHUB_SHA" \
             --title "$TITLE" \
             --notes "Automated desktop build for Exchange Airdrop Analyzer."
