@@ -1,0 +1,4 @@
+position_id,market_symbol,net_quantity,net_exposure_quantity,net_exposure_notional,net_cost,mark_price,entry_price,cumulative_pnl_realized,total_unrealized_pnl,total_funding_quantity,total_interest,total_liquidated,total_trading_fees,last_event_type,max_net_quantity,max_net_quantity_direction,closing_price,account_leverage,opened_at,closed_at
+p1,BTC_USDC_PERP,0.01,0.01,"1,234.56",100,50000,49000,-12.34,0,0,0,false,3.25,CLOSE,0.02,LONG,50500,5,2024-01-01T00:00:00Z,2024-01-02T00:00:00Z
+p2,ETH_USDC_PERP,0.5,0.5,"1.234,56",200,3000,2900,50.00,0,0,0,false,1.5,CLOSE,0.7,LONG,3100,3,2024-01-03T00:00:00Z,2024-01-04T00:00:00Z
+p3,SOL_USDC_PERP,1,1,invalid,80,120,110,10,0,0,0,false,2,CLOSE,1.2,LONG,130,2,2024-01-05T00:00:00Z,2024-01-06T00:00:00Z
