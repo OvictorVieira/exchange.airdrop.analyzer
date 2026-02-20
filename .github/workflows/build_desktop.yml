@@ -1,0 +1,139 @@
+name: Build Desktop Apps
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos-silicon:
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: apps/desktop
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/desktop/package-lock.json
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build (macOS Apple Silicon)
+        run: bash scripts/build_tauri_macos.sh
+
+      - name: Rename artifact (macOS Apple Silicon)
+        run: mv dist/Exchange_Airdrop_Analyzer_macos.zip dist/Exchange_Airdrop_Analyzer_macos_aarch64.zip
+
+      - name: Upload artifact (macOS Apple Silicon)
+        uses: actions/upload-artifact@v4
+        with:
+          name: exchange-airdrop-analyzer-macos-aarch64
+          path: apps/desktop/dist/Exchange_Airdrop_Analyzer_macos_aarch64.zip
+          if-no-files-found: error
+
+  build-macos-intel:
+    runs-on: macos-13
+    defaults:
+      run:
+        working-directory: apps/desktop
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/desktop/package-lock.json
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build (macOS Intel)
+        run: bash scripts/build_tauri_macos.sh
+
+      - name: Rename artifact (macOS Intel)
+        run: mv dist/Exchange_Airdrop_Analyzer_macos.zip dist/Exchange_Airdrop_Analyzer_macos_x64.zip
+
+      - name: Upload artifact (macOS Intel)
+        uses: actions/upload-artifact@v4
+        with:
+          name: exchange-airdrop-analyzer-macos-x64
+          path: apps/desktop/dist/Exchange_Airdrop_Analyzer_macos_x64.zip
+          if-no-files-found: error
+
+  build-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: apps/desktop
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/desktop/package-lock.json
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build (Windows Portable)
+        run: powershell -ExecutionPolicy Bypass -File scripts/build_tauri_windows.ps1
+
+      - name: Upload artifact (Windows Portable)
+        uses: actions/upload-artifact@v4
+        with:
+          name: exchange-airdrop-analyzer-windows-portable
+          path: apps/desktop/dist/Exchange_Airdrop_Analyzer_windows_portable.zip
+          if-no-files-found: error
+
+  publish-release:
+    runs-on: ubuntu-latest
+    needs:
+      - build-macos-silicon
+      - build-macos-intel
+      - build-windows
+    steps:
+      - name: Download artifact (macOS Apple Silicon)
+        uses: actions/download-artifact@v4
+        with:
+          name: exchange-airdrop-analyzer-macos-aarch64
+          path: release-assets
+
+      - name: Download artifact (macOS Intel)
+        uses: actions/download-artifact@v4
+        with:
+          name: exchange-airdrop-analyzer-macos-x64
+          path: release-assets
+
+      - name: Download artifact (Windows Portable)
+        uses: actions/download-artifact@v4
+        with:
+          name: exchange-airdrop-analyzer-windows-portable
+          path: release-assets
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="desktop-build-$(date -u +%Y%m%d-%H%M)-${GITHUB_SHA::7}"
+          TITLE="Desktop Build ${TAG}"
+          gh release create "$TAG" \
+            release-assets/Exchange_Airdrop_Analyzer_macos_aarch64.zip \
+            release-assets/Exchange_Airdrop_Analyzer_macos_x64.zip \
+            release-assets/Exchange_Airdrop_Analyzer_windows_portable.zip \
+            --title "$TITLE" \
+            --notes "Automated desktop build for Exchange Airdrop Analyzer."
