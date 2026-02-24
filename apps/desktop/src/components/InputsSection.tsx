@@ -1,4 +1,4 @@
-import { parseLocaleNumber } from '../core';
+import { parseLocaleNumber, type SupportedExchange } from '../core';
 
 export interface InputState {
   pointsOwn: string;
@@ -10,6 +10,7 @@ export interface InputState {
 
 interface InputsSectionProps {
   title: string;
+  exchangeId: SupportedExchange;
   labels: {
     pointsOwn: string;
     pointsFree: string;
@@ -148,7 +149,9 @@ function normalizeForEditing(value: string): string {
   return parsed.toFixed(MAX_DECIMAL_DIGITS).replace(/\.?0+$/, '');
 }
 
-export function InputsSection({ title, labels, state, onChange }: InputsSectionProps) {
+export function InputsSection({ title, exchangeId, labels, state, onChange }: InputsSectionProps) {
+  const isPacifica = exchangeId === 'pacifica';
+
   function handleNumericChange(key: NumericInputKey, value: string) {
     const normalized = normalizeDecimalInput(value);
 
@@ -199,17 +202,19 @@ export function InputsSection({ title, labels, state, onChange }: InputsSectionP
           />
         </label>
 
-        <label>
-          <span>{labels.pointToToken}</span>
-          <input
-            type="text"
-            inputMode="decimal"
-            value={state.pointToToken}
-            onChange={(event) => handleNumericChange('pointToToken', event.target.value)}
-            onFocus={() => handleNumericFocus('pointToToken')}
-            onBlur={() => handleNumericBlur('pointToToken')}
-          />
-        </label>
+        {!isPacifica ? (
+          <label>
+            <span>{labels.pointToToken}</span>
+            <input
+              type="text"
+              inputMode="decimal"
+              value={state.pointToToken}
+              onChange={(event) => handleNumericChange('pointToToken', event.target.value)}
+              onFocus={() => handleNumericFocus('pointToToken')}
+              onBlur={() => handleNumericBlur('pointToToken')}
+            />
+          </label>
+        ) : null}
 
         <label>
           <span>{labels.tokenPrice}</span>
@@ -223,22 +228,24 @@ export function InputsSection({ title, labels, state, onChange }: InputsSectionP
         </label>
       </div>
 
-      <details className="advanced-settings">
-        <summary>{labels.advancedSettings}</summary>
-        <div className="advanced-grid">
-          <label>
-            <span>{labels.pointsFree}</span>
-            <input
-              type="text"
-              inputMode="decimal"
-              value={state.pointsFree}
-              onChange={(event) => handleNumericChange('pointsFree', event.target.value)}
-              onBlur={() => handleNumericBlur('pointsFree')}
-            />
-            <small className="field-help">{labels.pointsFreeHint}</small>
-          </label>
-        </div>
-      </details>
+      {!isPacifica ? (
+        <details className="advanced-settings">
+          <summary>{labels.advancedSettings}</summary>
+          <div className="advanced-grid">
+            <label>
+              <span>{labels.pointsFree}</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={state.pointsFree}
+                onChange={(event) => handleNumericChange('pointsFree', event.target.value)}
+                onBlur={() => handleNumericBlur('pointsFree')}
+              />
+              <small className="field-help">{labels.pointsFreeHint}</small>
+            </label>
+          </div>
+        </details>
+      ) : null}
     </section>
   );
 }

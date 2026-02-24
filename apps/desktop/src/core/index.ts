@@ -6,3 +6,4 @@ export * from './farm-diagnosis';
 export * from './exchanges/registry';
 export * from './exchanges/number';
 export * from './exchanges/backpack';
+export * from './exchanges/pacifica';

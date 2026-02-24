@@ -1,4 +1,4 @@
-export type SupportedExchange = 'backpack';
+export type SupportedExchange = 'backpack' | 'pacifica';
 
 export type RiskProfile = 'conservative' | 'moderate' | 'aggressive';
 

@@ -490,21 +490,24 @@ button.guide-link-button:focus-visible {
 
 .farm-diagnosis-row {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) auto;
-  align-items: baseline;
-  gap: 0.9rem;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 220px);
+  align-items: center;
+  gap: 1rem;
 }
 
 .farm-diagnosis-row span {
   color: #4b5563;
   font-size: 0.88rem;
+  min-width: 0;
 }
 
 .farm-diagnosis-row strong {
+  justify-self: end;
   text-align: right;
   font-size: 0.9rem;
-  white-space: nowrap;
+  min-width: 0;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .farm-diagnosis-row strong.positive {
@@ -536,10 +539,11 @@ button.guide-link-button:focus-visible {
 @media (max-width: 900px) {
   .farm-diagnosis-row {
     grid-template-columns: 1fr;
-    gap: 0.25rem;
+    gap: 0.2rem;
   }
 
   .farm-diagnosis-row strong {
+    justify-self: start;
     text-align: left;
   }
 }

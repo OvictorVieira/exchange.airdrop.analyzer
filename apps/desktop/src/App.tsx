@@ -37,13 +37,20 @@ function emptyParseResult(exchangeId: SupportedExchange): ExchangeParseResult {
   };
 }
 
-function parseInputState(inputState: InputState): AnalyzerInputs | null {
+function parseInputState(inputState: InputState, exchangeId: SupportedExchange): AnalyzerInputs | null {
   const pointsOwn = parseLocaleNumber(inputState.pointsOwn);
-  const pointsFree = parseLocaleNumber(inputState.pointsFree);
-  const pointToToken = parseLocaleNumber(inputState.pointToToken);
   const tokenPrice = parseLocaleNumber(inputState.tokenPrice);
 
-  if (pointsOwn === null || pointsFree === null || pointToToken === null || tokenPrice === null) {
+  if (pointsOwn === null || tokenPrice === null) {
+    return null;
+  }
+
+  const pointsFree =
+    exchangeId === 'pacifica' ? 0 : parseLocaleNumber(inputState.pointsFree);
+  const pointToToken =
+    exchangeId === 'pacifica' ? 1 : parseLocaleNumber(inputState.pointToToken);
+
+  if (pointsFree === null || pointToToken === null) {
     return null;
   }
 
@@ -124,6 +131,7 @@ export function App() {
   );
   const languageOptions = useMemo(() => getSupportedLanguages(), []);
   const translate = (key: string) => t(language, key);
+  const isPacifica = exchangeId === 'pacifica';
 
   useEffect(() => {
     if (typeof localStorage === 'undefined') {
@@ -185,7 +193,7 @@ export function App() {
     };
   }, [exchangeId, selectedFiles]);
 
-  const parsedInputs = useMemo(() => parseInputState(inputsState), [inputsState]);
+  const parsedInputs = useMemo(() => parseInputState(inputsState, exchangeId), [exchangeId, inputsState]);
 
   const inputErrors = useMemo(() => {
     if (!parsedInputs) {
@@ -329,19 +337,42 @@ export function App() {
         selectFilesLabel={translate('selectFiles')}
         clearAllLabel={translate('clearAll')}
         guideButtonLabel={translate('guideButtonLabel')}
-        guideModalTitle={translate('guideModalTitle')}
-        guideModalIntro={translate('guideModalIntro')}
+        guideModalTitle={
+          isPacifica ? translate('guideModalTitlePacifica') : translate('guideModalTitle')
+        }
+        guideModalIntro={
+          isPacifica ? translate('guideModalIntroPacifica') : translate('guideModalIntro')
+        }
         guideAccessText={translate('guideAccessText')}
-        guideAccessLinkLabel={translate('guideAccessLinkLabel')}
-        guideStep1={translate('guideStep1')}
-        guideStep2={translate('guideStep2')}
-        guideStep3={translate('guideStep3')}
-        guideStep4={translate('guideStep4')}
+        guideAccessUrl={
+          isPacifica
+            ? 'https://app.pacifica.fi/portfolio'
+            : 'https://backpack.exchange/portfolio/trades/fills'
+        }
+        guideAccessLinkLabel={
+          isPacifica ? translate('guideAccessLinkLabelPacifica') : translate('guideAccessLinkLabel')
+        }
+        guideSteps={
+          isPacifica
+            ? [translate('guideStep1Pacifica'), translate('guideStep2Pacifica')]
+            : [
+                translate('guideStep1'),
+                translate('guideStep2'),
+                translate('guideStep3'),
+                translate('guideStep4')
+              ]
+        }
         guideRememberTitle={translate('guideRememberTitle')}
-        guideRememberAccount={translate('guideRememberAccount')}
-        guideRememberAll={translate('guideRememberAll')}
-        guideRememberExport={translate('guideRememberExport')}
-        guideRememberRepeat={translate('guideRememberRepeat')}
+        guideRememberItems={
+          isPacifica
+            ? [translate('guideRememberTradeHistory'), translate('guideRememberExport')]
+            : [
+                translate('guideRememberAccount'),
+                translate('guideRememberAll'),
+                translate('guideRememberExport'),
+                translate('guideRememberRepeat')
+              ]
+        }
         closeLabel={translate('closeLabel')}
         removeLabel={translate('remove')}
         parsingLabel={translate('parsing')}
@@ -372,6 +403,7 @@ export function App() {
 
       <InputsSection
         title={translate('inputsTitle')}
+        exchangeId={exchangeId}
         labels={{
           pointsOwn: translate('pointsOwn'),
           pointsFree: translate('pointsFree'),

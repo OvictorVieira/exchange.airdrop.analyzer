@@ -11,16 +11,11 @@ interface ImportCsvSectionProps {
   guideModalTitle: string;
   guideModalIntro: string;
   guideAccessText: string;
+  guideAccessUrl: string;
   guideAccessLinkLabel: string;
-  guideStep1: string;
-  guideStep2: string;
-  guideStep3: string;
-  guideStep4: string;
+  guideSteps: string[];
   guideRememberTitle: string;
-  guideRememberAccount: string;
-  guideRememberAll: string;
-  guideRememberExport: string;
-  guideRememberRepeat: string;
+  guideRememberItems: string[];
   closeLabel: string;
   removeLabel: string;
   parsingLabel: string;
@@ -55,16 +50,11 @@ export function ImportCsvSection({
   guideModalTitle,
   guideModalIntro,
   guideAccessText,
+  guideAccessUrl,
   guideAccessLinkLabel,
-  guideStep1,
-  guideStep2,
-  guideStep3,
-  guideStep4,
+  guideSteps,
   guideRememberTitle,
-  guideRememberAccount,
-  guideRememberAll,
-  guideRememberExport,
-  guideRememberRepeat,
+  guideRememberItems,
   closeLabel,
   removeLabel,
   parsingLabel,
@@ -136,14 +126,12 @@ export function ImportCsvSection({
   }
 
   async function handleOpenGuideLink() {
-    const url = 'https://backpack.exchange/portfolio/trades/fills';
-
     try {
       const { openUrl } = await import('@tauri-apps/plugin-opener');
-      await openUrl(url);
+      await openUrl(guideAccessUrl);
       return;
     } catch {
-      window.open(url, '_blank', 'noopener,noreferrer');
+      window.open(guideAccessUrl, '_blank', 'noopener,noreferrer');
     }
   }
 
@@ -201,17 +189,21 @@ export function ImportCsvSection({
             <div className="guide-alert">
               <strong>{guideRememberTitle}</strong>
               <div className="guide-tags">
-                <span className="guide-tag">{guideRememberAccount}</span>
-                <span className="guide-tag">{guideRememberAll}</span>
-                <span className="guide-tag">{guideRememberExport}</span>
-                <span className="guide-tag">{guideRememberRepeat}</span>
+                {guideRememberItems
+                  .filter((item) => item.trim().length > 0)
+                  .map((item) => (
+                    <span key={item} className="guide-tag">
+                      {item}
+                    </span>
+                  ))}
               </div>
             </div>
             <ol className="guide-steps">
-              <li>{guideStep1}</li>
-              <li>{guideStep2}</li>
-              <li>{guideStep3}</li>
-              <li>{guideStep4}</li>
+              {guideSteps
+                .filter((step) => step.trim().length > 0)
+                .map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
             </ol>
           </div>
         </div>

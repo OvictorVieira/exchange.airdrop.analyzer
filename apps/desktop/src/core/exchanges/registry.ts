@@ -1,9 +1,11 @@
 import type { SupportedExchange } from '../models';
 import { backpackExchangeAdapter } from './backpack';
+import { pacificaExchangeAdapter } from './pacifica';
 import type { ExchangeAdapter } from './types';
 
 const adapters: Record<SupportedExchange, ExchangeAdapter> = {
-  backpack: backpackExchangeAdapter
+  backpack: backpackExchangeAdapter,
+  pacifica: pacificaExchangeAdapter
 };
 
 export function getExchangeAdapter(exchangeId: SupportedExchange): ExchangeAdapter {
